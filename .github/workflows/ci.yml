@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run tests (Windows PowerShell 5.1)
+        shell: powershell
+        run: .\tests\Run-Tests.ps1
+
+      - name: Dry run on the runner
+        shell: powershell
+        run: .\EnviroEasy.ps1 -DryRun
+
+      - name: Lint (PSScriptAnalyzer)
+        shell: powershell
+        run: |
+          Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
+          # Errors fail the build; warnings are listed for information.
+          # Write-Host is intentional: this is an interactive console tool.
+          $all = Invoke-ScriptAnalyzer -Path . -Recurse -ExcludeRule PSAvoidUsingWriteHost
+          $all | Format-Table RuleName, Severity, ScriptName, Line -AutoSize
+          if ($all | Where-Object Severity -eq 'Error') { exit 1 }

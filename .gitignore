@@ -1,0 +1,11 @@
+# Test / local artifacts
+EnviroEasyTest-*/
+*.log
+backups/
+
+# OS / editor
+Thumbs.db
+Desktop.ini
+.vs/
+.vscode/
+.idea/
